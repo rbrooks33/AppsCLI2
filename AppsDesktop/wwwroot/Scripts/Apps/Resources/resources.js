@@ -19,6 +19,25 @@
       "FileName": "jquery-te-1.4.0.min.js",
       "Description": "Turns any text element into an text editor."
     },
+      {
+          "Name": "Froala HTML Editor",
+          "Enabled": true,
+          "LoadFirst": false,
+          "Order": 3,
+          "ModuleType": "require",
+          "ModuleName": "Froala",
+          "FileName": "froala.js",
+          "Description": "Turns any text element into an HTML editor."
+      },
+      {
+          "Name": "Froala CSS",
+          "Enabled": true,
+          "LoadFirst": false,
+          "Order": 1,
+          "ModuleType": "style",
+          "FileName": "froala.css",
+          "Description": "Froala Editor CSS"
+      },
     {
       "Name": "JQTE CSS",
       "Enabled": false,
@@ -147,6 +166,15 @@
       "FileName": "grid.js",
       "Description": "Quick grids."
     },
+      {
+          "Name": "Grid CSS",
+          "Enabled": true,
+          "LoadFirst": false,
+          "Order": 1,
+          "ModuleType": "style",
+          "FileName": "grid.css",
+          "Description": "Grid CSS"
+      },
       {
           "Name": "Apps Bind Helper",
           "Enabled": true,

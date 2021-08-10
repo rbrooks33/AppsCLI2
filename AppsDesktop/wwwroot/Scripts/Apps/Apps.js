@@ -465,33 +465,34 @@
             if (typeof c === 'function')
                 c = new c();
 
-            if (config.Initialize) {
-
-                console.log('running intitialize of ' + config.Name);
-
-                //Added "UI" config (rb 3/12/2021)
-                if (config.UI && config.UI === true) {
-
-                    Apps.LoadUI(config.Name, c, function () {
-
+            //Added "UI" config (rb 3/12/2021)
+            if (config.UI && config.UI === true) {
+                Apps.LoadUI(config.Name, c, function () {
+                    if(config.Initialize)
                         c.Initialize();
-
-                        //if (config.Framework === 'react' && config.AutoTranspile) {
-
-                        //    var input = JSON.stringify(c); // 'const getMessage = () => "Hello World";';
-                        //    var output = Babel.transform(input, { presets: ['es2015'] }).code;
-                        //    //console.log(output);
-                        //    c = JSON.parse(output); //Put back on coll as js
-                        //}
-
-                        //We might not initialize by default any more??
-                        //Apps.AutoComponents[componentName].Initialize();
-                    });
-                }
-                else {
-                    c.Initialize();
-                }
+                });
             }
+            else {
+                if (config.Initialize)
+                    c.Initialize();
+            }
+
+        //    if (config.Initialize) {
+
+        //        console.log('running intitialize of ' + config.Name);
+        //        c.Initialize();
+
+        //        //if (config.Framework === 'react' && config.AutoTranspile) {
+
+        //        //    var input = JSON.stringify(c); // 'const getMessage = () => "Hello World";';
+        //        //    var output = Babel.transform(input, { presets: ['es2015'] }).code;
+        //        //    //console.log(output);
+        //        //    c = JSON.parse(output); //Put back on coll as js
+        //        //}
+
+        //        //We might not initialize by default any more??
+        //        //Apps.AutoComponents[componentName].Initialize();
+        //    }
         }
         else
             if (Apps.Settings.Debug)
@@ -1114,32 +1115,39 @@ instead show notifications.
 
     Gets: [],
     Posts: [],
-    RegisterGET: function (dataName, url) {
+    RegisterGET: function (dataName, url, component) {
 
         this.Gets.push({ DataName: dataName, URL: url, Args: null });
 
-        Apps.Data[dataName] = {
+        var parentObj = Apps;
+
+        if (component) {
+            parentObj = component;
+            if (parentObj.Data == null)
+                parentObj['Data'] = {};
+        }
+
+        parentObj.Data[dataName] = {
             Success: false,
             Path: url,
             Data: null,
             Refresh: function (args, callback) {
 
-                let newPath = this.Path.SearchAndReplace.apply(Apps.Data[dataName].Path, args);
+                let newPath = this.Path.SearchAndReplace.apply(parentObj.Data[dataName].Path, args);
 
                 Apps.Get(newPath, function (error, result) {
 
                     if (!error) {
-                        Apps.Data[dataName].Success = !error && result.Success;
-                        Apps.Data[dataName].Data = result.Data;
+                        parentObj.Data[dataName].Success = !error && result.Success;
+                        parentObj.Data[dataName].Data = result.Data;
                     }
                     else
-                        Apps.Data.HandleException(result);
+                        parentObj.Data.HandleException(result);
 
-                    Apps.Data[dataName].Result = result;
+                    parentObj.Data[dataName].Result = result;
 
                     if (callback)
                         callback();
-
                 });
             }
         };

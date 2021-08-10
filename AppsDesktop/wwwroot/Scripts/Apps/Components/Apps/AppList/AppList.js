@@ -87,7 +87,10 @@
         },
         UpdateAppHTML: function (app) {
 
-            //let appNameElement = $('.Apps_AppName_Label_ID' + app.AppID);
+            //Update app
+            let appNameElement = $('.Apps_AppName_Label_ID' + app.AppID);
+            appNameElement.text(app.AppName);
+
             let appDivStyle = $('.Apps_App_DivStyle_ID' + app.AppID);
 
             let planDiv = $('.Apps_Plan_Div_ID' + app.AppID);

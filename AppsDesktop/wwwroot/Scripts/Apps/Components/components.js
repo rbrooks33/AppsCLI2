@@ -44,6 +44,14 @@
                                             "Components": []
                                         }
                                     ]
+                                    
+                                },
+                                {
+                                    "Name": "SubComponents",
+                                    "Load": true,
+                                    "Initialize": true,
+                                    "UI": false,
+                                    "Components":[]
                                 }
                             ]
                         }
@@ -196,8 +204,13 @@
                   "Initialize": true,
                   "UI": true
 
+              },
+              {
+                  "Name": "Login",
+                  "Load": true,
+                  "Initialize": true,
+                  "UI": true
               }
-
           ]
       },
     

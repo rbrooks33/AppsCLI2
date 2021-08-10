@@ -42,8 +42,6 @@ namespace AppsDesktop
             //});
 
             //services.addeaddeAddEntityFrameworkSqlite().AddDbContext<DatabaseContext>();
-            
-            services.AddSingleton<OpenQA.Selenium.Chrome.ChromeDriver>(new OpenQA.Selenium.Chrome.ChromeDriver(Environment.CurrentDirectory + "\\Libraries"));
 
             //Main db
             Action<AppsData> liteDBOptions = (opt =>
@@ -78,6 +76,10 @@ namespace AppsDesktop
             //        builder.WithOrigins("http://localhost:52780");
             //    });
             //});
+            services.AddIdentityCore<Brooksoft.Apps.User>(options => {  });
+            services.AddScoped<Microsoft.AspNetCore.Identity.IUserStore<Brooksoft.Apps.User>, Brooksoft.Apps.UserStore>();
+            services.AddAuthentication("cookies").AddCookie("cookies", options => options.LoginPath = "/Home/Login");
+
             services.AddSignalR();
             services.AddControllers();
             services.AddMvcCore().AddNewtonsoftJson(options =>
@@ -140,6 +142,16 @@ namespace AppsDesktop
 
             //var clientConfig = new AppsClientConfig();
             //clientConfig.Load("Brooksoft.Apps", Environment.MachineName, Environment.CurrentDirectory, new System.Version(0, 0, 1), new List<string>(), new List<AppsCustomConfigItem>(), true, true, new AppFlow());
+            try
+            {
+                services.AddSingleton<OpenQA.Selenium.Chrome.ChromeDriver>(new OpenQA.Selenium.Chrome.ChromeDriver(Environment.CurrentDirectory + "\\Libraries"));
+            }
+            catch(System.Exception ex)
+            {
+                //var result = new AppsClient.AppsResult();
+                //new AppFlows.Helpers.AppsSystem.Exception(ex, ref result);
+                AppsLog.LogError("Exception loading selenium chrome driver: " + ex.Message);
+            }
 
             AppsLog.LogInfo("Finished configure services.");
             //var perms = new Brooksoft.Apps.Business.Publish.Permissions();
@@ -164,11 +176,12 @@ namespace AppsDesktop
             
             app.UseHttpsRedirection();
 
+
             app.UseRouting();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             //app.addj.AddJsonOptions(options =>
             // {

@@ -408,14 +408,15 @@ define(['./util.js'], function (Util) {
 
                 var targetclass = $(event.target).attr("class");
 
-                if (targetclass !== "grid_view_span"
+                if (targetclass !== "grid_view_span gridlistitem"
                     && targetclass !== "grid_edit_span"
                     && !$(event.target).hasClass("editcontrol")
                     && !$(event.target).hasClass("isdate")
                     && !$(event.target).hasClass("jqte_tool_icon")
                     && !$(event.target.offsetParent).hasClass("editCellStyle")
                     && !$(event.target.parentElement).hasClass("grid_view_span")
-                    && !$(event.target).hasClass("jqte_editor")) {
+                    && !$(event.target).hasClass("jqte_editor")
+                    && targetclass !== undefined) {
 
                     $(".grid_view_span").show();
                     $(".grid_edit_span").hide();
@@ -740,6 +741,7 @@ define(['./util.js'], function (Util) {
 
                 var editcontrol = $(td).find(".editcontrol"); //Should only be one
 
+
                 //if (editcontrol.hasClass('codeeditor')) {
                 //    var aceEdit = ace.edit(editcontrol[0].id);
                 //    aceEdit.setTheme("ace/theme/monokai");
@@ -753,6 +755,41 @@ define(['./util.js'], function (Util) {
                 $(editcontrol).select();
                 var rowdata = unescape(td.parent().attr("rowdata"));
                 var rowdataobj = JSON.parse(rowdata);
+
+                if (editcontrol.hasClass('editor')) {
+
+                    //var editor = new Apps.Froala.FroalaEditor(editcontrol);
+                    var test = new Apps.Froala('.editcontrol.editor', {}, function () {
+
+                        $('.fr-view').addClass('gridlistitem');
+
+                    //    if (test.length == undefined) {
+                    //        $(test.el).find('li').css('display', 'list-item').css('list-style', 'initial');
+                    //    }
+                    //    else if (test.length > 1) {
+                    //        $.each(test, function (index, testElement) {
+                    //            $(testElement.el).find('li').css('display', 'list-item').css('list-style', 'initial');
+                    //        });
+                    //    }
+                    });
+
+                    //, {
+                    //    listAdvancedTypes: true,
+                    //    toolbarButtons: ['formatOL', 'formatUL']
+                    //}); //#gridStories_ViewFormat_Row0_ColStoryDescription');
+
+                    //if(editcontrol.prevObject.find('.jqte_hiddenField').length == 0)
+                    //    editcontrol.jqte();
+
+                    //var fieldValue = unescape(eval('objRowData.' + field.name));
+                    //var editorClassName = prefix + '_' + field.name + '_Editor';
+                    //$(div).find("." + editorClassName).jqte();
+                    //$(div).find("." + editorClassName).jqteVal(fieldValue);
+
+                    
+                    
+
+                }
             }
 
             if (callback) {
@@ -888,6 +925,13 @@ define(['./util.js'], function (Util) {
             settings.returntableonly = true;
             Me.RefreshHTML(settings);
             settings.table.attr("id", settings.id); //Give it the name that would normally go to the grid parent div
+            //settings.table.find('li').css('display', 'list-item');
+            //settings.table.find('ol').css('list-style', 'unset');
+            //settings.table.find('ul').css('list-style', 'unset');
+            //settings.table.find('li').css('display','list-item').css('list-style','initial');
+
+            settings.table.find('.grid_view_span').addClass('gridlistitem');
+
             return settings.table[0];
         },
         RefreshHTML: function (settings) {
@@ -1180,7 +1224,7 @@ define(['./util.js'], function (Util) {
                                 }
 
                                 //EDIT
-                                var editSpan = '<span class="grid_edit_span" style="display:none;">';
+                                var editSpan = '<span class="grid_edit_span" style="display:none;list-style:initial;">';
 
                                 var edittype = "text"; //default to text
 

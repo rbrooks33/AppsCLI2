@@ -10,5 +10,6 @@ namespace Brooksoft.Apps.Client.Docs
         public int AppComponentID { get; set; }
         public string StoryName { get; set; }
         public string StoryDescription { get; set; }
+        public bool Archived { get; set; }
     }
 }

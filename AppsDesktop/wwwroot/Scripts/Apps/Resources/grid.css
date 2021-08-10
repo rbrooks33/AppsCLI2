@@ -1,0 +1,14 @@
+﻿.gridlistitem ul li {
+    display: list-item !important;
+    list-style: initial !important;
+    list-style-type: circle !important;
+    margin-left: 0px !important;
+    height: initial !important;
+}
+.gridlistitem ol li {
+    display: list-item !important;
+    list-style: initial !important;
+    list-style-type: decimal !important;
+    margin-left: 0px !important;
+    height:initial !important;
+}

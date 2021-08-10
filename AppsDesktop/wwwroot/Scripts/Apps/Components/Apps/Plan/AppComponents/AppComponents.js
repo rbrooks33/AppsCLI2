@@ -2,27 +2,27 @@
     var Me = {
         Initialize: function () {
 
-            Apps.Data.RegisterGET('AppComponents', '/api/AppComponent/GetAppComponents?appId={0}');
-            Apps.Data.RegisterGET('AppComponentModel', '/api/AppComponent/GetAppComponentModel');
+            Apps.Data.RegisterGET('AppComponents', '/api/AppComponent/GetAppComponents?appId={0}', Me);
+            Apps.Data.RegisterGET('AppComponentModel', '/api/AppComponent/GetAppComponentModel', Me);
             Apps.Data.RegisterPOST('UpsertAppComponent', '/api/AppComponent/UpsertAppComponent');
-            Apps.Data.AppComponentModel.Refresh();
 
+            Me.Data.AppComponentModel.Refresh();
         },
         Show: function () {
 
             var app = Apps.Data.App.Data[0];
 
-            Apps.Data.AppComponents.Refresh([app.AppID], function () {
+            Me.Data.AppComponents.Refresh([app.AppID], function () {
 
                 let table = Apps.Grids.GetTable({
                     id: "gridAppComponents",
-                    data: Apps.Data.AppComponents.Data,
+                    data: Me.Data.AppComponents.Data,
                     title: app.AppName + ' <span style="color:lightgrey;">App Components</span>',
                     tableactions: [
                         {
                             text: "Add Component",
                             actionclick: function () {
-                                Apps.Data.AppComponents.Selected = null;
+                                Apps.Components.Apps.Plan.AppComponents.Data.AppComponents.Selected = null;
                                 Apps.Components.Apps.Plan.AppComponents.Upsert();
                             }
 
@@ -31,11 +31,23 @@
                     tablestyle: "",
                     rowactions: [
                         {
+                            text: "Add Component",
+                            actionclick: function (td, appComponent, tr) {
+                                 
+                                let newChildComponent = {
+                                    ParentComponentID : appComponent.ID
+                                };
+                                
+                                Apps.Components.Apps.Plan.AppComponents.Data.AppComponents.Selected = newChildComponent;
+                                Apps.Components.Apps.Plan.AppComponents.Upsert();
+                            }
+                        },
+                        {
                             text: "Delete",
                             actionclick: function (td, appComponent, tr) {
                                 if (confirm('Are you sure?')) {
                                     appComponent.Archived = true;
-                                    Apps.Data.AppComponents.Selected = appComponent;
+                                    Apps.Components.Apps.Plan.AppComponents.Data.AppComponents.Selected = appComponent;
                                     Apps.Components.Apps.Plan.AppComponents.Upsert();
                                 }
                             }
@@ -43,9 +55,15 @@
                     ],
                     rowbuttons: [
                         {
+                            text: "Sub-Components",
+                            buttonclick: function (td, appComponent, tr) {
+                                Apps.Components.Apps.Plan.AppComponents.ShowComponents(td, appComponent, tr);
+                            }
+                        },
+                        {
                             text: "Stories",
                             buttonclick: function (td, appComponent, tr) {
-                                Apps.Components.Apps.Plan.AppComponents.ShowStories(td, appComponent, tr);
+                                Apps.Components.Apps.Plan.AppComponents.Stories.Show(td, appComponent, tr);
                             }
                         }
                     ],
@@ -58,7 +76,7 @@
                             saveclick: function (td, appComponent, input) {
                                 appComponent.AppID = Apps.Data.App.Data[0].AppID;
                                 appComponent.AppComponentName = $(input).val();
-                                Apps.Data.AppComponents.Selected = appComponent;
+                                Apps.Components.Apps.Plan.AppComponents.Data.AppComponents.Selected = appComponent;
                                 Apps.Components.Apps.Plan.AppComponents.Upsert();
                             }
                         },
@@ -69,7 +87,7 @@
                             saveclick: function (td, appComponent, input) {
                                 appComponent.AppID = Apps.Data.App.Data[0].AppID;
                                 appComponent.AppComponentDescription = $(input).val();
-                                Apps.Data.AppComponents.Selected = appComponent;
+                                Apps.Components.Apps.Plan.AppComponents.Data.AppComponents.Selected = appComponent;
                                 Apps.Components.Apps.Plan.AppComponents.Upsert();
                             }
                         }
@@ -113,32 +131,32 @@
         },
         Upsert: function () {
 
-            let appComponent = Apps.Data.AppComponentModel.Data;
-            if (Apps.Data.AppComponents.Selected)
-                appComponent = Apps.Data.AppComponents.Selected;
+            let appComponent = Me.Data.AppComponentModel.Data; //Insert (blank) model object
+
+            if (Me.Data.AppComponents.Selected)
+                appComponent = Me.Data.AppComponents.Selected; //Use/update an existing object
 
             appComponent.AppID = Apps.Data.App.Data[0].AppID;
 
             Apps.Data.Post('UpsertAppComponent', appComponent, function () {
-                Apps.Data.AppComponents.Selected = null;
+                Me.Data.AppComponents.Selected = null;
                 Apps.Notify('success', 'Upserted app component.');
                 Me.Show();
             });
         },
-        //Put in row below selected item
-        ShowStories: function (td, appComponent, tr) {
+        ShowComponents: function (td, appComponent, tr) {
 
-            Apps.Data.AppComponents.Selected = appComponent;
+            Me.Data.AppComponents.Selected = appComponent;
 
-            let row = $('#Plan_AppComponents_StoriesRow' + appComponent.ID);
+            let row = $('#Plan_AppComponents_SubComponentsRow' + appComponent.ID);
 
             if (row.length == 0) {
 
-                Me.Stories.GetStories(appComponent, function (html) {
+                Me.SubComponents.GetSubComponents(appComponent, function (html) {
 
-                    $(tr).after('<tr><td id="Plan_AppComponents_StoriesRow' + appComponent.ID + '" style="display:none;" colspan="5">' + html + '</td></tr>');
+                    $(tr).after('<tr><td id="Plan_AppComponents_SubComponentsRow' + appComponent.ID + '" style="display:none;" colspan="5">' + html + '</td></tr>');
 
-                    row = $('#Plan_AppComponents_StoriesRow' + appComponent.ID);
+                    row = $('#Plan_AppComponents_SubComponentsRow' + appComponent.ID);
 
                     row.show(400);
 
@@ -146,24 +164,7 @@
             }
             else
                 row.detach();
-        },
-        //Refresh existing row below selected item
-        RefreshStories: function (appComponent) {
-
-            Apps.Data.AppComponents.Selected = appComponent;
-
-            let row = $('#Plan_AppComponents_StoriesRow' + appComponent.ID);
-
-            if (row.length == 1) {
-
-                Me.Stories.GetStories(appComponent, function (html) {
-
-                    row.html(html);
-
-                });
-            }
-        },
-
+        }
     };
     return Me;
 });
